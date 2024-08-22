@@ -14,16 +14,21 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   lastMessage: string = '';
+  loading: boolean = false;
 
   constructor(private websocketService: WebsocketService) {
     this.websocketService.getMessages().subscribe({
-      next: (message) => this.lastMessage = message.error || message.result.message,
+      next: (message) => {
+        this.loading = false;
+        this.lastMessage = message.error || message.result.message;
+      },
       error: (error) => console.error('Erro no WebSocket:', error),
       complete: () => console.log('Conexão WebSocket encerrada')
     });
   }
 
   login(): void {
+    this.loading = true;
     const loginData = { username: this.username, password: this.password };
     this.websocketService.sendMessage({
       method: 'auth.login',
